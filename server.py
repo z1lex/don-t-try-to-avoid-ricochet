@@ -13,24 +13,44 @@ class Human:
             for x in range(self.x, self.x + game.consts.body_length):
                 if game.field[x][self.y - 1] != 0:
                     flag = False
+            for i in range(game.consts.players):
+                if game.humans[i].id != self.id:
+                    if game.humans[i].y == self.y - game.consts.body_length:
+                        if self.x <= game.humans[i].x < self.x + game.consts.body_length:
+                            flag = False
             if flag:
                 self.y -= 1
         if command == 's':
             for x in range(self.x, self.x + game.consts.body_length):
                 if game.field[x][self.y + game.consts.body_length] != 0:
                     flag = False
+            for i in range(game.consts.players):
+                if game.humans[i].id != self.id:
+                    if game.humans[i].y == self.y + game.consts.body_length:
+                        if self.x <= game.humans[i].x < self.x + game.consts.body_length:
+                            flag = False
             if flag:
                 self.y += 1
         if command == 'a':
             for y in range(self.y, self.y + game.consts.body_length):
                 if game.field[self.x - 1][y] != 0:
                     flag = False
+            for i in range(game.consts.players):
+                if game.humans[i].id != self.id:
+                    if game.humans[i].x == self.x - game.consts.body_length:
+                        if self.y <= game.humans[i].y < self.y + game.consts.body_length:
+                            flag = False
             if flag:
                 self.x -= 1
         if command == 'd':
             for y in range(self.y, self.y + game.consts.body_length):
                 if game.field[self.x + game.consts.body_length][y] != 0:
                     flag = False
+            for i in range(game.consts.players):
+                if game.humans[i].id != self.id:
+                    if game.humans[i].x == self.x + game.consts.body_length:
+                        if self.y <= game.humans[i].y < self.y + game.consts.body_length:
+                            flag = False
             if flag:
                 self.x += 1
         return flag
