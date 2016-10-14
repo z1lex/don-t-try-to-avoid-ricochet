@@ -1,0 +1,33 @@
+from tkinter import *
+sz = 32
+ty = 20
+def create_disp(sz, ty):
+    root = Tk()
+    c = Canvas(root, width= sz * ty, height = sz * ty, bg = "black")
+    c.pack()
+    player = c.create_rectangle(0, sz, sz, 0, tag="rect", fill="lightgreen")
+    return [c, player, root]
+p = create_disp(sz, ty)
+c = p[0]
+player = p[1]
+root = p[2]
+print(type(c), player)
+
+def disp_tick(btns, c, player, move_lenght, root):
+    x = 0
+    y = 0
+    if 'a' in btns:
+        x -= lng
+    if 's' in btns:
+        y += lng
+    if 'w' in btns:
+        y -= lng
+    if 'd' in btns:
+        x += lng
+    c.move(player, x, y)
+    root.update()
+
+while 1:
+    print(-1)
+    disp_tick(['s'], c, player, 1, root)
+
