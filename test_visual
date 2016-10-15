@@ -2,15 +2,15 @@ from tkinter import *
 import server
 
 
-def create_disp(sz, ty):
+def create_disp(size, nmb_of_cells):
     root = Tk()
-    c = Canvas(root, width= sz * ty, height = sz * ty, bg = "black")
-    c.pack()
-    player = c.create_rectangle(0, sz, sz, 0, tag="rect", fill="lightgreen")
+    cnv = Canvas(root, width= size * nmb_of_cells, height = size * nmb_of_cells, bg = "black")
+    cnv.pack()
+    player = cnv.create_rectangle(0, size, size, 0, tag="rect", fill="lightgreen")
     return [c, player, root]
 
 
-def disp_tick(btns, c, player, move_lenght, root):
+def disp_tick(btns, cnv, player, move_lenght, root):
     x = 0
     y = 0
     if 'a' in btns:
@@ -21,14 +21,14 @@ def disp_tick(btns, c, player, move_lenght, root):
         y -= move_lenght
     if 'd' in btns:
         x += move_lenght
-    c.move(player, x, y)
+    cnv.move(player, x, y)
     root.update()
 
 out_of_create_disp = create_disp(game.consts.widht, game.consts.pixels_on_one_square)
-c = out_of_create_disp[0]
+cnv = out_of_create_disp[0]
 player = out_of_create_disp[1]
 root = out_of_create_disp[2]
 
 while 1:
     print(-1)
-    disp_tick(['s'], c, player, 1, root)
+    disp_tick(['s'], cnv, player, 1, root)
