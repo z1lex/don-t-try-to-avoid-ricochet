@@ -63,7 +63,8 @@ class Human:
     def do_move(self, commands, is_fire, cursour):
         self.move_cooldown = max(0, self.move_cooldown - 1)
         if self.move_cooldown == 0 and is_fire:
-            game.
+            game.bullets[game.curid] = Bullet(self.x, self.y, cursour.x, cursour.y)
+            self.move_cooldown = game.consts.move_cooldown
         move = []
         if self.move_cooldown == 0:
             if len(commands) != 0:
@@ -77,10 +78,11 @@ class Human:
 
 
 class Bullet:
-    def __init__(self, x, y, vector_x, vector_y, curid):
+    def __init__(self, x, y, vector_x, vector_y, curid, creator_id):
         self.x = x
         self.y = y
         self.id = curid
+        self.creator_id = creator_id
         self.vector = Vector(vector_x, vector_y)
         self.move_cooldown = 0
         self.line = Line(x, y, x + vector_x, y + vector_y)
@@ -166,7 +168,7 @@ class Game:
             self.humans.append(Human(self.consts.resp[i][0], self.consts.resp[i][1], i))
 
 
-    def do_tick(self, commands, is_fire, coursor):
+    def do_tick(self, commands, is_fire, cursour):
         answer = ans_init()
         for i in range(self.consts.players):
             answer['humans'][i]['move'] = self.humans[i].do_move(commands[i], curid)
