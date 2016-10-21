@@ -90,8 +90,12 @@ class Bullet:
 
 
     def first_crossed(self):
-        for square in self.line.crossing_squares:
-            if (square.x + 1 <= self.x) and self.vector.x > 0:
+        if self.vector.x < 0:
+            indexacya = -1
+        else:
+            indexacya = 1
+        for square in self.line.crossing_squares[::indexacya]:
+            if (square.x + 1 <= self.x) and self.vector.x >= 0:
                 continue
             if (square.x >= self.x) and self.vector.x <= 0:
                 continue
