@@ -1,7 +1,9 @@
 import math
+import sys
 class Consts:
     def __init__(self, players = 2):
         self.maxplayers = 2
+        self.eps = 1e-5
         self.resp = [0 for i in range(self.maxplayers)]
         self.resp[0] = [5, 5]
         self.resp[1] = [15, 15]
@@ -10,14 +12,14 @@ class Consts:
         self.tick_rate = 100
         self.human_speed = 0.2 #dist per tick
         self.bullet_speed = 0.5 #dist per tick
-        self.shoot_cooldown = 1 * tick_rate #in ticks
+        self.shoot_cooldown = 1 * self.tick_rate #in ticks
         self.move_cooldown = self.tick_rate // self.human_speed
-        self.width = 100 #parallel OY
-        self.length = 100 #parallel OX
+        self.width = 20 #parallel OY
+        self.length = 20 #parallel OX
         self.pixels_on_one_square = 8
         self.bullet_maxenergy = 504
         self.bullet_flycost = 14 #lost per tick 
-        self.bullet_ricochetcost = 88 #lost per ricochet
+        self.bullet_ricochet_cost = 88 #lost per ricochet
 consts = Consts()
 def ans_init():
     answer = dict()
@@ -80,7 +82,7 @@ class Vector:
 
     def __mul__(self, other):
         if type(other) == int or type(other) == float:
-            return (self.x * other, self.y * other)
+            return Vector(self.x * other, self.y * other)
         return self.x * other.x + self.y * other.y
 
 
@@ -92,7 +94,8 @@ class Vector:
     def __neg__(self):
         return Vector(-self.x, -self.y)
 
-
+    def normed(self):
+        return Vector(self.x / self.len(), self.y / self.len())
     def __str__(self):
         return str(self.x) + ' ' + str(self.y)
 
@@ -100,9 +103,10 @@ class Line:
     def __init__(self, x1, y1, x2, y2):
         self.flag = False
         if (x1 == x2):
-            self.flag = True #line don't cross OY
-            self.k = None
-            self.b = x1
+            #self.flag = True #line don't cross OY
+            #self.k = None
+            #self.b = x1
+            x2 += Consts().eps
         else:
             self.k = (y2 - y1) / (x2 - x1)
             self.b = y1 - self.k * x1
@@ -112,8 +116,12 @@ class Line:
                 self.crossing_squares.append(Vector(x1, y))
         else:
             for x in range(Consts().length + 1):
-                ymin = max(0, math.floor(self.k * x + self.b))
-                ymax = min(Consts().width, math.floor(self.k * x + self.b + self.k))
+                y1 = self.k * x + self.b
+                #max(0, math.floor(self.k * x + self.b))
+                y2 = self.k * x + self.b + self.k
+                #min(Consts().width, math.floor(self.k * x + self.b + self.k))
+                ymin = max(0, math.floor(min(y1, y2)))
+                ymax = min(Consts().width, math.floor(max(y1, y2) + Consts().eps))
                 for y in range(ymin, ymax + 1):
                     self.crossing_squares.append(Vector(x, y))
 

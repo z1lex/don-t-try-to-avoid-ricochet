@@ -83,7 +83,7 @@ class Bullet:
         self.y = y
         self.id = curid
         self.creator_id = creator_id
-        self.vector = Vector(vector_x, vector_y)
+        self.vector = Vector(vector_x, vector_y).normed()
         self.move_cooldown = 0
         self.line = Line(x, y, x + vector_x, y + vector_y)
         self.kinetic = game.consts.bullet_maxenergy
@@ -91,12 +91,16 @@ class Bullet:
 
     def first_crossed(self):
         for square in self.line.crossing_squares:
-            if (-self.vector) * (square - (Vector(self.x, self.y) + self.vector)) < 0:
+            if (square.x + 1 <= self.x) and self.vector.x > 0:
                 continue
-            if (self.vector) * (square + Vector(1, 1) - (Vector(self.x, self.y))) < 0:
+            if (square.x >= self.x) and self.vector.x <= 0:
                 continue
             if game.field[square.x][square.y] != 0:
-                return square
+                if self.x < square.x or self.x > square.x + 1 or self.y < square.y or self.y > square.y + 1:
+                    return square
+                else:
+                    continue
+        return None
 
 
     def first_crossed_point(self):
@@ -110,15 +114,15 @@ class Bullet:
                 mn = Vector(self.x, self.y).dist2(point)
                 ans = point
         return ans
-    def is_int(x):
+    def is_int(self, x):
         return (abs(x - int(x)) <= game.consts.eps)
 
     def vector_change_on_move(self):
-        pt = self.firstcrossed_point()
-        if is_int(pt.x):
-            return Vector(-pt.x, pt.y)
+        pt = self.first_crossed_point()
+        if self.is_int(pt.x):
+            return Vector(-self.vector.x, self.vector.y)
         else:
-            return Vector(pt.x, -pt.y)
+            return Vector(self.vector.x, -self.vector.y)
 
     def kinetic_cost(self, x1, y1, x2, y2):
         return (Vector(x2, y2) - Vector(x1, y1)).len() / game.consts.bullet_speed * game.consts.bullet_flycost
@@ -135,30 +139,34 @@ class Bullet:
     def do_move(self, remaning_time): #time in ticks
         point_crossed_with_squares = self.first_crossed_point()
         kinetic_cost = self.kinetic_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
-        time_cost = self.time_cost(self.x, self.y, points_crossed_with_squares.x, points_crossed_with_squares.y)
+        time_cost = self.time_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
         if self.kinetic < kinetic_cost:
             #bullet is destroyed
             return [self.kinetic_move() + Vector(self.x, self.y)]
         if remaning_time < time_cost:
-            #bullet is destroyed
-            return [self.time_move(remaning_time)]
+            #bullet continue moving next
+            ans = [Vector(self.x, self.y) + self.time_move(remaning_time)]
+            self.x += self.time_move(remaning_time).x
+            self.y += self.time_move(remaning_time).y
+            self.kinetic -= kinetic_cost
+            return ans
         self.kinetic -= kinetic_cost
         remaning_time -= time_cost
-        bullet_change_move = self.vector_change_move()
+        bullet_change_move = self.vector_change_on_move()
         self.x = point_crossed_with_squares.x
         self.y = point_crossed_with_squares.y
-        if self.kinetic < game.consts.ricochet_cost:
+        if self.kinetic < game.consts.bullet_ricochet_cost:
             #bullet is destroyed
             return [Vector(self.x, self.y)]
         self.vector = bullet_change_move
+        self.line = Line(self.x, self.y, self.x + self.vector.x, self.y + self.vector.y)
         curx = self.x
         cury = self.y
-        pts = do_move(remaning_time)
-        pts.append(Vector(curx, cury))
+        pts = self.do_move(remaning_time) + [Vector(curx, cury)]
         return pts
             
 class Game:
-    def __init__(self, players = 2, field = [[0 for j in range(20)] for i in range(20)]):
+    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0)) for j in range((Consts().width))] for i in range(Consts().length)]):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
@@ -183,3 +191,6 @@ class Game:
 
 
 game = Game()
+b = Bullet(1, 2.5, 2, 2, 0, 0)
+game.field[2][5] = 2
+game.field[3][4] = 2
