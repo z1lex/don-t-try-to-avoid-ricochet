@@ -1,51 +1,55 @@
 from tkinter import *
 from random import *
+from server import *
 
 def create_disp(size, nmb_of_cells):
     root = Tk()
     cnv = Canvas(root, width= size * nmb_of_cells, height = size * nmb_of_cells, bg = "black")
     cnv.pack()
-    player = cnv.create_rectangle(0, size, size, 0, tag="rect", fill="lightgreen")
-    return [c, player, root]
-
-out_of_create_disp = create_disp(game.consts.widht, game.consts.pixels_on_one_square)
-cnv = out_of_create_disp[0]
-player = out_of_create_disp[1]
-root = out_of_create_disp[2]
-crds = [0, size * nmb_of_cells, size * nmb_of_cells, 0]
-
-def disp_tick(btns, cnv, player, lng, root, sz, arr_of_blts, spd, crds):
-    x = 0
-    y = 0
-    y1 = 0
-    x1 = 0
-    if 'a' in btns:
-        x -= lng
-        x1 = 1
-    if 's' in btns:
-        y += lng
-        y1 = 1
-    if 'w' in btns:
-        y -= lng
-        y1 = -1
-    if 'd' in btns:
-        x += lng
-        x1 = 1
-    cnv.move(player, x, y)
-    crds[0] += x
-    crds[2] += x
-    crds[1] += y
-    crds[3] += y
+    player1 = cnv.create_rectangle(0, size, size, 0, tag="rect", fill="lightgreen")
+    player2 = cnv.create_rectangle(0, size, size, 0, tag="rect", fill="lightgreen")
     root.update()
-    if 'f' in btns:
+    return [cnv, player1, root, player2]
+
+out_of_create_disp = create_disp(game.consts.width, game.consts.pixels_on_one_square)
+cnv = out_of_create_disp[0]
+player = [out_of_create_disp[1], out_of_create_disp[3]]
+root = out_of_create_disp[2]
+crds = [0, game.consts.width * game.consts.pixels_on_one_square, game.consts.width * game.consts.pixels_on_one_square, 0]
+
+def disp_tick(btns, cnv, player, lng, root, arr_of_blts, spd):
+    print(btns)
+    for i in range(2):
+        x = 0
+        y = 0
+        y1 = 0
+        x1 = 0
+        if 'a' in btns[i]:
+            x -= lng
+            x1 = 1
+        if 's' in btns[i]:
+            y += lng
+            y1 = 1
+        if 'w' in btns[i]:
+            y -= lng
+            y1 = -1
+        if 'd' in btns[i]:
+            x += lng
+            x1 = 1
+        cnv.move(player[i], x, y)
+        crds[0] += x
+        crds[2] += x
+        crds[1] += y
+        crds[3] += y
+        root.update()
+    '''if 'f' in btns:
         blt = cnv.create_rectangle(crds[0], crds[1] - 3 * sz // 4, crds[2] - 3 * sz // 4, crds[3], tag="rect", fill="red")
         arr_of_blts.append([blt, x1 * spd, y * spd])
     for i in arr_of_blts:
         cnv.move(i[0], i[1], i[2])
         root.update()
-    return arr_of_blts
+    return arr_of_blts'''
 
-arr_of_blts = disp_tick(['s', 'd', 'f'], cnv, player, 1, root, sz, [], 2, crds)
 while 1:
-    print(-1)
-    disp_tick(['s', 'd'], cnv, player, 1, root, size * nmb_of_cells, arr_of_blts, 2, crds)
+    ans = game.do_tick([['s'], ['d']], None, None)
+    disp_tick([ans['humans'][0]['move'], ans['humans'][1]['move']], cnv, player, game.consts.move_cooldown, root, [], 0)
