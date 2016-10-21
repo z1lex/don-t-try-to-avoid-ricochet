@@ -183,8 +183,8 @@ class Game:
     def do_tick(self, commands, is_fire, cursour):
         answer = ans_init()
         for i in range(self.consts.players):
-            answer['humans'][i]['move'] = self.humans[i].do_move(commands[i], curid)
-        for bullet in bullets:
+            answer['humans'][i]['move'] = self.humans[i].do_move(commands[i], is_fire, cursour)
+        for bullet in self.bullets:
             pts = bullet.do_move(1)
             answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
             answer['bullets'][bullet.id]['direction'] = bullet.vector
