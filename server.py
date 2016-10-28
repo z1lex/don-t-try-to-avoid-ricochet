@@ -189,7 +189,8 @@ class Game:
             answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
             answer['bullets'][bullet.id]['direction'] = bullet.vector
             answer['bullets'][bullet.id]['pts'] = pts[::-1]
-        return answer
+        answer['consts'] = game.consts
+        return transform_ans(answer)
     
             
 

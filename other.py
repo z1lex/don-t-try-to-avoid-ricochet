@@ -5,8 +5,8 @@ class Consts:
         self.maxplayers = 2
         self.eps = 1e-5
         self.resp = [0 for i in range(self.maxplayers)]
-        self.resp[0] = [5, 5]
-        self.resp[1] = [15, 15]
+        self.resp[0] = [5, 5] #in decart
+        self.resp[1] = [15, 15] #in decart
         self.players = players
         self.body_length = 3 #hitbox is square
         self.tick_rate = 100
@@ -25,10 +25,27 @@ def ans_init():
     answer = dict()
     answer['humans'] = dict()
     answer['bullets'] = dict()
+    answer['consts'] = dict()
     for i in range(consts.maxplayers):
         answer['humans'][i] = dict()
         answer['humans'][i]['move'] = []
     return answer
+
+def transform_ans(answer):
+    for player_id in range(len(answer['humans'])):
+        for command_id in range(len(answer['humans'][player_id]['move'])):
+            if (answer['humans'][player_id]['move'][command_id] == 'w'):
+                answer['humans'][player_id]['move'][command_id] = 's'
+            elif (answer['humans'][player_id]['move'][command_id] == 's'):
+                answer['humans'][player_id]['move'][command_id] = 'w'
+
+    for bullet_id in answer['bullets'].keys():
+        answer['bullets'][bullet_id]['pos'].y = consts.width - answer['bullets'][bullet_id]['pos'].y
+        answer['bullets'][bullet_id]['direction'].y *= 1
+        for point_id in range(len(answer['bullets'][bullet_id]['pts'])):
+            answer['bullets'][bullet_id]['pts'][point_id].y = consts.width - answer['bullets'][bullet_id]['pts'][point_id].y
+    return answer
+        
 '''
 example of answer
 answer = {
@@ -45,7 +62,8 @@ answer = {
        24: pos = vector(7.6, 8.3) #hitbox is [8, 8]
            direction = vector(2, -1)
            pts = [vector(7.6, 8.3)]
-    } 
+    }
+    consts = Consts #object of class Consts (mb changed)
 }
 '''
 #def get_commands
