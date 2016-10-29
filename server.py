@@ -182,6 +182,7 @@ class Game:
 
     def do_tick(self, commands, is_fire, cursour):
         answer = ans_init()
+        commands, is_fire, cursour = transform_input(commands, is_fire, cursour)
         for i in range(self.consts.players):
             answer['humans'][i]['move'] = self.humans[i].do_move(commands[i], is_fire, cursour)
         for bullet in self.bullets:
