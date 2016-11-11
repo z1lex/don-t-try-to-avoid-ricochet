@@ -75,7 +75,7 @@ class Human:
                     if self.try_move(command):
                         move.append(command)    
                 self.move_cooldown = game.consts.move_cooldown
-        return move, new_bullets
+        return [move, new_bullets]
 
 
 class Bullet:
