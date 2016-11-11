@@ -185,7 +185,6 @@ class Game:
         cursour = Vector(cursour[0], cursour[1])
         commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
         answer = ans_init()
-        commands, is_fire, cursour = transform_input(commands, is_fire, cursour)
         for i in range(self.consts.players):
             ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
             answer['humans'][i]['move'] = ans_move
