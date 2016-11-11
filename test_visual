@@ -15,8 +15,8 @@ def create_disp(size, nmb_of_cells, resp):
     root = Tk()
     cnv = Canvas(root, width= size * nmb_of_cells, height = size * nmb_of_cells, bg = "black")
     cnv.pack()
-    player1 = cnv.create_rectangle(resp[0][0], size, size, resp[0][1], tag="rect", fill="lightgreen")
-    player2 = cnv.create_rectangle(resp[1][0], size, size, resp[1][1], tag="rect", fill="lightgreen")
+    player1 = cnv.create_rectangle(resp[0][0] * nmb_of_cells, size, size, resp[0][1] * nmb_of_cells, tag="rect", fill="lightgreen")
+    player2 = cnv.create_rectangle(resp[1][0] * nmb_of_cells, size, size, resp[1][1] * nmb_of_cells, tag="rect", fill="lightgreen")
     root.bind('<Button-1>', motion)
     root.update()
     return [cnv, player1, root, player2]
