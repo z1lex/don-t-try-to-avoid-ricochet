@@ -171,7 +171,7 @@ class Bullet:
         return pts
             
 class Game:
-    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0)) for j in range((Consts().width))] for i in range(Consts().length)]):
+    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0) or (i == Consts().length - 1) or j == Consts().width) for j in range((Consts().width))] for i in range(Consts().length)]):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
