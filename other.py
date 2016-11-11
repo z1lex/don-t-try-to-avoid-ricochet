@@ -53,7 +53,17 @@ def transform_ans(answer):
         for point_id in range(len(answer['bullets'][bullet_id]['pts'])):
             answer['bullets'][bullet_id]['pts'][point_id].y = consts.width - answer['bullets'][bullet_id]['pts'][point_id].y
     return answer
-        
+
+def transform_input(commands, is_fire, cursour):
+    if (cursour != None):
+        cursour.y = consts.width - cursour.y
+    for player in range(len(commands)):
+        for command_id in range(len(commands[player])):
+            if commands[player][command_id] == 'w':
+                commands[player][command_id] = 's'
+            elif commands[player][command_id] == 's':
+                commands[player][command_id] = 'w'
+    return (commands, is_fire, cursour)
 '''
 example of answer
 answer = {
