@@ -62,9 +62,12 @@ class Human:
     
     def do_move(self, commands, is_fire, cursour):
         self.move_cooldown = max(0, self.move_cooldown - 1)
-        if self.move_cooldown == 0 and is_fire:
-            game.bullets[game.curid] = Bullet(self.x, self.y, cursour.x, cursour.y)
-            self.move_cooldown = game.consts.move_cooldown
+        self.shoot_cooldown = max(0, self.shoot_cooldown - 1)
+        new_bullets = dict()
+        if self.shoot_cooldown == 0 and is_fire:
+            game.bullets[game.curid] = Bullet(self.x, self.y, cursour.x, cursour.y, self.id)
+            new_bullets[game.curid] = [self.x, self.y, cursour.x, cursour.y]
+            self.shoot_cooldown = game.consts.shoot_cooldown
         move = []
         if self.move_cooldown == 0:
             if len(commands) != 0:
@@ -72,9 +75,7 @@ class Human:
                     if self.try_move(command):
                         move.append(command)    
                 self.move_cooldown = game.consts.move_cooldown
-        else:
-            self.move_cooldown -= 1
-        return move
+        return move, new_bullets
 
 
 class Bullet:
@@ -181,14 +182,21 @@ class Game:
 
 
     def do_tick(self, commands, is_fire, cursour):
+        cursour = Vector(cursour[0], cursour[1])
+        commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
         answer = ans_init()
         for i in range(self.consts.players):
-            answer['humans'][i]['move'] = self.humans[i].do_move(commands[i], is_fire, cursour)
+            ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
+            answer['humans'][i]['move'] = ans_move
+            for cur_id in new_bullets:
+                answer['bullets'][cur_id]['is_resp'] = True
         for bullet in self.bullets:
             pts = bullet.do_move(1)
             answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
             answer['bullets'][bullet.id]['direction'] = bullet.vector
             answer['bullets'][bullet.id]['pts'] = pts[::-1]
+            if not ('is_resp' in answer['bullets'][bullet.id]):
+                answer['bullets'][bullet.id] = False
         answer['consts'] = game.consts
         return transform_ans(answer)
     
@@ -196,6 +204,3 @@ class Game:
 
 
 game = Game()
-b = Bullet(1, 2.5, 2, 2, 0, 0)
-game.field[2][5] = 2
-game.field[3][4] = 2

@@ -25,12 +25,20 @@ def ans_init():
     answer = dict()
     answer['humans'] = dict()
     answer['bullets'] = dict()
-    answer['consts'] = dict()
+    answer['consts'] = None
     for i in range(consts.maxplayers):
         answer['humans'][i] = dict()
         answer['humans'][i]['move'] = []
     return answer
-
+def convert_input(commands, is_fire, cursour):
+    for player in range(len(commands)):
+        for command_id in range(len(commands[player])):
+            if (commands[player][command_id] == 'w'):
+                commands[player][command_id] = 's'
+            elif (commands[player][command_id] == 's'):
+                  commands[player][command_id] = 'w'
+    cursour.y = consts.width - cursour.y
+    return commands, is_fire, cursour
 def transform_ans(answer):
     for player_id in range(len(answer['humans'])):
         for command_id in range(len(answer['humans'][player_id]['move'])):
@@ -41,7 +49,7 @@ def transform_ans(answer):
 
     for bullet_id in answer['bullets'].keys():
         answer['bullets'][bullet_id]['pos'].y = consts.width - answer['bullets'][bullet_id]['pos'].y
-        answer['bullets'][bullet_id]['direction'].y *= 1
+        answer['bullets'][bullet_id]['direction'].y *= -1
         for point_id in range(len(answer['bullets'][bullet_id]['pts'])):
             answer['bullets'][bullet_id]['pts'][point_id].y = consts.width - answer['bullets'][bullet_id]['pts'][point_id].y
     return answer
@@ -59,9 +67,14 @@ answer = {
        12: pos = vector(12, 34)
            direction = vector(2.2, -1.5) #length is distanse per 1 tick
            pts = [vector(31, 44), vector(12, 34)], moving key points, points, when direction changed(or last point)
+           is_resp = False
        24: pos = vector(7.6, 8.3) #hitbox is [8, 8]
+           is_resp = False
            direction = vector(2, -1)
            pts = [vector(7.6, 8.3)]
+       0:  pos = vector(1, 1)
+           direction = (-1.1, -2.2)
+           is_resp = True
     }
     consts = Consts #object of class Consts (mb changed)
 }
