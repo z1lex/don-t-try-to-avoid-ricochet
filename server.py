@@ -171,7 +171,7 @@ class Bullet:
         return pts
             
 class Game:
-    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0) or (i == Consts().length - 1) or j == Consts().width) for j in range((Consts().width))] for i in range(Consts().length)]):
+    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0) or (i == Consts().length - 1) or (j == Consts().width - 1)) for j in range((Consts().width))] for i in range(Consts().length)]):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
@@ -183,7 +183,7 @@ class Game:
 
     def do_tick(self, commands, is_fire, cursour):
         cursour = Vector(cursour[0], cursour[1])
-        commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
+        #commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
         answer = ans_init()
         for i in range(self.consts.players):
             ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
@@ -198,7 +198,8 @@ class Game:
             if not ('is_resp' in answer['bullets'][bullet.id]):
                 answer['bullets'][bullet.id] = False
         answer['consts'] = game.consts
-        return transform_ans(answer)
+        return answer
+        #return transform_ans(answer)
     
             
 
