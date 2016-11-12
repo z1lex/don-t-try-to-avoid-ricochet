@@ -20,7 +20,7 @@ class Human:
             for i in range(game.consts.players):
                 if game.humans[i].id != self.id:
                     if game.humans[i].y == self.y - game.consts.body_length:
-                        if self.x <= game.humans[i].x < self.x + game.consts.body_length:
+                        if self.x - game.consts.body_length + 1 <= game.humans[i].x < self.x + game.consts.body_length:
                             flag = False
             if flag:
                 self.y -= 1
@@ -31,7 +31,7 @@ class Human:
             for i in range(game.consts.players):
                 if game.humans[i].id != self.id:
                     if game.humans[i].y == self.y + game.consts.body_length:
-                        if self.x <= game.humans[i].x < self.x + game.consts.body_length:
+                        if self.x - game.consts.body_length + 1 <= game.humans[i].x < self.x + game.consts.body_length:
                             flag = False
             if flag:
                 self.y += 1
@@ -42,7 +42,7 @@ class Human:
             for i in range(game.consts.players):
                 if game.humans[i].id != self.id:
                     if game.humans[i].x == self.x - game.consts.body_length:
-                        if self.y <= game.humans[i].y < self.y + game.consts.body_length:
+                        if self.y - game.consts.body_length + 1 <= game.humans[i].y < self.y + game.consts.body_length:
                             flag = False
             if flag:
                 self.x -= 1
@@ -53,7 +53,7 @@ class Human:
             for i in range(game.consts.players):
                 if game.humans[i].id != self.id:
                     if game.humans[i].x == self.x + game.consts.body_length:
-                        if self.y <= game.humans[i].y < self.y + game.consts.body_length:
+                        if self.y - game.consts.body_length + 1 <= game.humans[i].y < self.y + game.consts.body_length:
                             flag = False
             if flag:
                 self.x += 1

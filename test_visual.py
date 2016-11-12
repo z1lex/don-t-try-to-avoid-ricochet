@@ -54,7 +54,7 @@ def disp_tick(btns, cnv, player, lng, root, arr_of_blts, spd):
         root.update()
 i = 0
 while 1:
-    if i < 100:
+    if i < 20:
         new_btns = [['s'], ['w']]
     else:
         new_btns = [['d'], ['a']]
@@ -64,7 +64,7 @@ while 1:
     fr = False
     print(ans['humans'])
     disp_tick([ans['humans'][0]['move'], ans['humans'][1]['move']], cnv, player, game.consts.pixels_on_one_square, root, [], 0)
-    #sleep(0.01)
+    sleep(0.02)
     i += 1
              
 
