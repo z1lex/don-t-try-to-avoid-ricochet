@@ -52,7 +52,18 @@ def disp_tick(btns, cnv, player, lng, root, arr_of_blts, spd):
         crds[1] += y
         crds[3] += y
         root.update()
+
+blts = []
+def crt_blt(cnv, x, y, c_id):
+    btns.append([cnv.create_rectangle(x, y, x + 5, y + 5, tag="", fill="red"), c_id])
+
+def mv_blt(arr_vct, blts, cnv):
+    for i in range(len(blts)):
+        cnv.move(blts[i][0], arr_vct[blts[i][1]]['pos'].x, arr_vct[blts[i][1]]['pos'].y)
+
 i = 0
+is_fire = 0
+crr_id = 0
 while 1:
     if i < 20:
         new_btns = [['s'], ['w']]
@@ -64,7 +75,9 @@ while 1:
     fr = False
     print(ans['humans'])
     disp_tick([ans['humans'][0]['move'], ans['humans'][1]['move']], cnv, player, game.consts.pixels_on_one_square, root, [], 0)
+    if is_fire == 1:
+        crr_id += 1
+        crt_blt(cnv, 50, 50, crr_id)
+    mv_blt(ans['bullets'], blts, cnv) 
     sleep(0.02)
     i += 1
-             
-
