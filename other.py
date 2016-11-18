@@ -26,6 +26,7 @@ def ans_init():
     answer['humans'] = dict()
     answer['bullets'] = dict()
     answer['consts'] = None
+    answer['squares'] = []
     for i in range(consts.maxplayers):
         answer['humans'][i] = dict()
         answer['humans'][i]['move'] = []
@@ -76,6 +77,10 @@ answer = {
            direction = (-1.1, -2.2)
            is_resp = True
     }
+    squares = [
+        [1, 2, 3], # point (1, 2) converted in 3
+        [x, y, d]
+    ]
     consts = Consts #object of class Consts (mb changed)
 }
 '''

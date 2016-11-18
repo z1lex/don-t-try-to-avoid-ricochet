@@ -65,8 +65,9 @@ class Human:
         self.shoot_cooldown = max(0, self.shoot_cooldown - 1)
         new_bullets = dict()
         if self.shoot_cooldown == 0 and is_fire:
-            game.bullets[game.curid] = Bullet(self.x, self.y, cursour.x, cursour.y, self.id)
-            new_bullets[game.curid] = [self.x, self.y, cursour.x, cursour.y]
+            game.bullets[game.curid] = Bullet(self.x + game.consts.body_length // 2, self.y + game.consts.body_length // 2, cursour.x, cursour.y, game.curid, self.id)
+            new_bullets[game.curid] = [self.x + game.consts.body_length // 2, self.y + game.consts.body_length // 2, cursour.x, cursour.y]
+            game.curid += 1
             self.shoot_cooldown = game.consts.shoot_cooldown
         move = []
         if self.move_cooldown == 0:
@@ -142,33 +143,38 @@ class Bullet:
         return self.vector * (time * game.consts.bullet_speed)
 
     def do_move(self, remaning_time): #time in ticks
+        is_destroyed = [0] #[0] - continue mooving, [1] - destroyed without effects, [2, x, y] - destroyed points arround (x, y), [3, id] - destroyed tank with id=id
         point_crossed_with_squares = self.first_crossed_point()
         kinetic_cost = self.kinetic_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
         time_cost = self.time_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
         if self.kinetic < kinetic_cost:
             #bullet is destroyed
-            return [self.kinetic_move() + Vector(self.x, self.y)]
+            return [1], [self.kinetic_move() + Vector(self.x, self.y)]
         if remaning_time < time_cost:
             #bullet continue moving next
             ans = [Vector(self.x, self.y) + self.time_move(remaning_time)]
             self.x += self.time_move(remaning_time).x
             self.y += self.time_move(remaning_time).y
             self.kinetic -= kinetic_cost
-            return ans
+            return [0], ans
         self.kinetic -= kinetic_cost
         remaning_time -= time_cost
         bullet_change_move = self.vector_change_on_move()
         self.x = point_crossed_with_squares.x
         self.y = point_crossed_with_squares.y
+        if game.field[self.x][self.y] == 1:
+            #bullet has destroyed wall
+            return [2], [Vector(x, y)]
         if self.kinetic < game.consts.bullet_ricochet_cost:
             #bullet is destroyed
-            return [Vector(self.x, self.y)]
+            return [0], [Vector(self.x, self.y)]
         self.vector = bullet_change_move
         self.line = Line(self.x, self.y, self.x + self.vector.x, self.y + self.vector.y)
         curx = self.x
         cury = self.y
-        pts = self.do_move(remaning_time) + [Vector(curx, cury)]
-        return pts
+        is_destroyed, pts = self.do_move(remaning_time)
+        pts += [Vector(curx, cury)]
+        return is_destroyed, pts
             
 class Game:
     def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0) or (i == Consts().length - 1) or (j == Consts().width - 1)) for j in range((Consts().width))] for i in range(Consts().length)]):
@@ -184,19 +190,36 @@ class Game:
     def do_tick(self, commands, is_fire, cursour):
         cursour = Vector(cursour[0], cursour[1])
         #commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
-        answer = ans_init()
+        answer = ans_init() 
         for i in range(self.consts.players):
             ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
             answer['humans'][i]['move'] = ans_move
             for cur_id in new_bullets:
+                answer['bullets'][cur_id] = dict()
                 answer['bullets'][cur_id]['is_resp'] = True
-        for bullet in self.bullets:
-            pts = bullet.do_move(1)
-            answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
-            answer['bullets'][bullet.id]['direction'] = bullet.vector
-            answer['bullets'][bullet.id]['pts'] = pts[::-1]
-            if not ('is_resp' in answer['bullets'][bullet.id]):
-                answer['bullets'][bullet.id] = False
+        cur_bullets = list(self.bullets.keys())
+        for bullet in cur_bullets:
+            bullet = self.bullets[bullet]
+            is_destroyed, pts = bullet.do_move(1)
+            if (is_destroyed[0] != 0):
+                self.bullets.pop(bullet.id)
+                if (is_destroyed[0] == 2):
+                    x = is_destroyed[1]
+                    y = is_destroyed[2]
+                    for i in range(x - 1, x + 1):
+                        for j in range(y - 1, y + 1):
+                            if (i >= 0) and (j >= 0) and (i < self.consts.length) and (j < self.consts.width) and (abs(x - i) + abs(y - j) <= 1) and (self.field[i][j] == 1):
+                                answer['squares'].append([i, j, 0])
+                                game.field[i][j] = 0
+                    
+            else:
+                if not (bullet.id in answer['bullets']):
+                    answer['bullets'][bullet.id] = dict()
+                answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
+                answer['bullets'][bullet.id]['direction'] = bullet.vector
+                answer['bullets'][bullet.id]['pts'] = pts[::-1]
+                if not ('is_resp' in answer['bullets'][bullet.id]):
+                    answer['bullets'][bullet.id]['is_resp'] = False
         answer['consts'] = game.consts
         return answer
         #return transform_ans(answer)
