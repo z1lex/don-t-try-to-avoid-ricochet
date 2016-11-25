@@ -6,7 +6,7 @@ class Consts:
         self.eps = 1e-5
         self.resp = [0 for i in range(self.maxplayers)]
         self.resp[0] = [5, 5] #in decart
-        self.resp[1] = [15, 15] #in decart
+        self.resp[1] = [14, 14] #in decart
         self.players = players
         self.body_length = 3 #hitbox is square
         self.tick_rate = 100
@@ -148,17 +148,17 @@ class Line:
             self.b = y1 - self.k * x1
         self.crossing_squares = [] #squares on a Cartesian system.
         if (x1 == x2):
-            for y in range(Consts().width + 1):
+            for y in range(Consts().width):
                 self.crossing_squares.append(Vector(x1, y))
         else:
-            for x in range(Consts().length + 1):
+            for x in range(Consts().length):
                 y1 = self.k * x + self.b
                 #max(0, math.floor(self.k * x + self.b))
                 y2 = self.k * x + self.b + self.k
                 #min(Consts().width, math.floor(self.k * x + self.b + self.k))
                 ymin = max(0, math.floor(min(y1, y2)))
                 ymax = min(Consts().width, math.floor(max(y1, y2) + Consts().eps))
-                for y in range(ymin, ymax + 1):
+                for y in range(max(ymin, 0), min(ymax + 1, Consts().width)):
                     self.crossing_squares.append(Vector(x, y))
 
 
@@ -169,13 +169,13 @@ class Line:
             return []
         else:
             ans = []
-            if (p1.x <= (p1.y - self.b) / self.k <= p1.x + 1):
+            if (p1.x - Consts().eps <= (p1.y - self.b) / self.k <= p1.x + 1 + Consts().eps):
                 ans.append(Vector((p1.y - self.b) / self.k, p1.y))
-            if (p1.x <= (p1.y + 1 - self.b) / self.k <= p1.x + 1):
+            if (p1.x - Consts().eps <= (p1.y + 1 - self.b) / self.k <= p1.x + 1 + Consts().eps):
                 ans.append(Vector((p1.y + 1 - self.b) / self.k, p1.y + 1))
-            if (p1.y <= (p1.x * self.k + self.b) <= p1.y + 1):
+            if (p1.y - Consts().eps <= (p1.x * self.k + self.b) <= p1.y + 1 + Consts().eps):
                 ans.append(Vector(p1.x, p1.x * self.k + self.b))
-            if (p1.y <= ((p1.x + 1) * self.k + self.b) <= p1.y + 1):
+            if (p1.y - Consts().eps <= ((p1.x + 1) * self.k + self.b) <= p1.y + 1 + Consts().eps):
                 ans.append(Vector(p1.x + 1, (p1.x + 1) * self.k + self.b))
             return ans
             

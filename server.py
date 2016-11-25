@@ -8,7 +8,8 @@ class Human:
         self.id = id
         self.move_cooldown = 0
         self.shoot_cooldown = 0
-
+    def die(self):
+        print("on umer, no tut eshe nichego net")
 
     
     def try_move(self, command):
@@ -144,6 +145,9 @@ class Bullet:
 
     def do_move(self, remaning_time): #time in ticks
         is_destroyed = [0] #[0] - continue mooving, [1] - destroyed without effects, [2, x, y] - destroyed points arround (x, y), [3, id] - destroyed tank with id=id
+        first_crossed_in_field = self.first_crossed()
+        x = first_crossed_in_field.x
+        y = first_crossed_in_field.y
         point_crossed_with_squares = self.first_crossed_point()
         kinetic_cost = self.kinetic_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
         time_cost = self.time_cost(self.x, self.y, point_crossed_with_squares.x, point_crossed_with_squares.y)
@@ -162,9 +166,18 @@ class Bullet:
         bullet_change_move = self.vector_change_on_move()
         self.x = point_crossed_with_squares.x
         self.y = point_crossed_with_squares.y
-        if game.field[self.x][self.y] == 1:
+        if game.field[x][y] == 1:
             #bullet has destroyed wall
-            return [2], [Vector(x, y)]
+            return [2, x, y], [Vector(self.x, self.y)]
+        is_self_tank = False
+        if game.field[x][y] == 3:
+            #bullet has destroyed human maybe
+            for human in game.humans:
+                if (x - human.x <= 2) and (y - human.y <= 2):
+                    if (human.id != self.creator_id):
+                        return [3, x, y], [Vector(self.x, self.y)]
+                    else:
+                        is_self_tank = True
         if self.kinetic < game.consts.bullet_ricochet_cost:
             #bullet is destroyed
             return [0], [Vector(self.x, self.y)]
@@ -173,11 +186,12 @@ class Bullet:
         curx = self.x
         cury = self.y
         is_destroyed, pts = self.do_move(remaning_time)
-        pts += [Vector(curx, cury)]
+        if (is_self_tank == False):
+            pts += [Vector(curx, cury)]
         return is_destroyed, pts
             
 class Game:
-    def __init__(self, players = 2, field = [[2 * ((j == 0) or (i == 0) or (i == Consts().length - 1) or (j == Consts().width - 1)) for j in range((Consts().width))] for i in range(Consts().length)]):
+    def __init__(self, players = 2, field = [[2 * ((j <= 1) or (i <= 1) or (i >= Consts().length - 2) or (j >= Consts().width - 2)) for j in range((Consts().width))] for i in range(Consts().length)]):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
@@ -197,12 +211,26 @@ class Game:
             for cur_id in new_bullets:
                 answer['bullets'][cur_id] = dict()
                 answer['bullets'][cur_id]['is_resp'] = True
+            for x in range(max(0, self.humans[i].x - 1), min(game.consts.length, self.humans[i].x + game.consts.body_length + 1)):
+                for y in range(max(0, self.humans[i].y - 1), min(game.consts.width, self.humans[i].y + game.consts.body_length + 1)):
+                    if game.field[x][y] == 3:
+                        game.field[x][y] = 0
+        for i in range(self.consts.players):
+            for x in range(self.humans[i].x, self.humans[i].x + game.consts.body_length):
+                for y in range(self.humans[i].y, self.humans[i].y + game.consts.body_length):
+                    game.field[x][y] = 3
         cur_bullets = list(self.bullets.keys())
         for bullet in cur_bullets:
             bullet = self.bullets[bullet]
             is_destroyed, pts = bullet.do_move(1)
             if (is_destroyed[0] != 0):
                 self.bullets.pop(bullet.id)
+                if (is_destroyed[0] == 3):
+                    x = is_destroyed[1]
+                    y = is_destroyed[2]
+                    for human in self.humans:
+                        if (x - human.x <= 2) and (y - human.y <= 2):
+                            human.die()
                 if (is_destroyed[0] == 2):
                     x = is_destroyed[1]
                     y = is_destroyed[2]
@@ -211,6 +239,9 @@ class Game:
                             if (i >= 0) and (j >= 0) and (i < self.consts.length) and (j < self.consts.width) and (abs(x - i) + abs(y - j) <= 1) and (self.field[i][j] == 1):
                                 answer['squares'].append([i, j, 0])
                                 game.field[i][j] = 0
+                if not (bullet.id in answer['bullets']):
+                    answer['bullets'][bullet.id] = dict()
+                answer['bullets'][bullet.id]['die'] = True
                     
             else:
                 if not (bullet.id in answer['bullets']):
