@@ -8,10 +8,11 @@ class Human:
         self.id = id
         self.move_cooldown = 0
         self.shoot_cooldown = 0
+        self.respawn_time = 0
     def die(self):
-        print("on umer, no tut eshe nichego net")
-
-    
+        self.respawn_time = game.consts.respawn_time
+        self.x = game.consts.length + 1
+        self.y = game.consts.width + 1
     def try_move(self, command):
         flag = True
         if command == 'w':
@@ -64,6 +65,13 @@ class Human:
     def do_move(self, commands, is_fire, cursour):
         self.move_cooldown = max(0, self.move_cooldown - 1)
         self.shoot_cooldown = max(0, self.shoot_cooldown - 1)
+        if self.respawn_time > 1:
+            return [None, None]
+        if self.respawn_time == 1:
+            self.x = game.consts.resp[self.id][0]
+            self.y = game.consts.resp[self.id][1]
+            return [None, 'resp']
+        self.respawn_time = max(0, self.respawn_time - 1)
         new_bullets = dict()
         if self.shoot_cooldown == 0 and is_fire:
             game.bullets[game.curid] = Bullet(self.x + game.consts.body_length // 2, self.y + game.consts.body_length // 2, cursour.x, cursour.y, game.curid, self.id)
@@ -207,7 +215,13 @@ class Game:
         answer = ans_init() 
         for i in range(self.consts.players):
             ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
-            answer['humans'][i]['move'] = ans_move
+            if ans_move == None and new_bullets == None: #died
+                answer['humans'][i]['move'] = []
+            elif ans_move == None and new_bullets == 'resp': #already resp
+                answer['humans'][i]['move'] = []
+                answer['humans'][i]['is_resp'] = True
+            else:
+                answer['humans'][i]['move'] = ans_move
             for cur_id in new_bullets:
                 answer['bullets'][cur_id] = dict()
                 answer['bullets'][cur_id]['is_resp'] = True

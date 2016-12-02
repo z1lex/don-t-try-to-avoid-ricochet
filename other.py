@@ -12,6 +12,7 @@ class Consts:
         self.tick_rate = 100
         self.human_speed = 0.2 #dist per tick
         self.bullet_speed = 0.5 #dist per tick
+        self.respawn_time = 200 #ticks
         self.shoot_cooldown = 1 * self.tick_rate #in ticks
         self.move_cooldown = int(1 / self.human_speed + self.eps)
         self.width = 20 #parallel OY
