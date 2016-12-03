@@ -239,8 +239,9 @@ class Game:
                     x = is_destroyed[1]
                     y = is_destroyed[2]
                     for human in self.humans:
-                        if (x - human.x <= 2) and (y - human.y <= 2):
+                        if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length):
                             human.die()
+                            answer['humans'][human.id]['die'] = True
                 if (is_destroyed[0] == 2):
                     x = is_destroyed[1]
                     y = is_destroyed[2]

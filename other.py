@@ -62,8 +62,10 @@ answer = {
     humans = [
         0:
             move = ['w', 'a'] #commands that executed
+            is_resp = True
         1:
             move = []
+            die = True
     ]
     bullets = { #key is id
        12: pos = vector(12, 34)
