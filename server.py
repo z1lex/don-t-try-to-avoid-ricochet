@@ -1,5 +1,5 @@
 from other import *
-
+import socket
 
 class Human:
     def __init__(self, x, y, id):
@@ -199,7 +199,11 @@ class Bullet:
         return is_destroyed, pts
             
 class Game:
-    def __init__(self, players = 2, field = [[2 * ((j <= 1) or (i <= 1) or (i >= Consts().length - 2) or (j >= Consts().width - 2)) for j in range((Consts().width))] for i in range(Consts().length)]):
+    def __init__(self, players = 2, field = [[2 * ((j <= 1) or
+                                                   (i <= 1) or
+                                                   (i >= Consts().length - 2) or
+                                                   (j >= Consts().width - 2))
+                                                for j in range((Consts().width))] for i in range(Consts().length)]):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
@@ -260,12 +264,12 @@ class Game:
             else:
                 if not (bullet.id in answer['bullets']):
                     answer['bullets'][bullet.id] = dict()
-                answer['bullets'][bullet.id]['pos'] = Vector(bullet.x, bullet.y)
-                answer['bullets'][bullet.id]['direction'] = bullet.vector
+                answer['bullets'][bullet.id]['pos'] = [bullet.x, bullet.y]
+                answer['bullets'][bullet.id]['direction'] = [bullet.vector.x, bullet.vector.y]
                 answer['bullets'][bullet.id]['pts'] = pts[::-1]
                 if not ('is_resp' in answer['bullets'][bullet.id]):
                     answer['bullets'][bullet.id]['is_resp'] = False
-        answer['consts'] = game.consts
+        answer['consts'] = 'suka_blyat'
         return answer
         #return transform_ans(answer)
     
@@ -273,3 +277,5 @@ class Game:
 
 
 game = Game()
+
+
