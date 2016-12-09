@@ -115,6 +115,9 @@ class Bullet:
                     return square
                 else:
                     continue
+            for human in game.humans:
+                if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length) and (self.creator_id != self.id):
+                    return square
         return None
 
 
@@ -178,10 +181,10 @@ class Bullet:
             #bullet has destroyed wall
             return [2, x, y], [Vector(self.x, self.y)]
         is_self_tank = False
-        if game.field[x][y] == 3:
+        if game.field[x][y] == 0:
             #bullet has destroyed human maybe
             for human in game.humans:
-                if (x - human.x <= 2) and (y - human.y <= 2):
+                if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length):
                     if (human.id != self.creator_id):
                         return [3, x, y], [Vector(self.x, self.y)]
                     else:
@@ -229,14 +232,7 @@ class Game:
             for cur_id in new_bullets:
                 answer['bullets'][cur_id] = dict()
                 answer['bullets'][cur_id]['is_resp'] = True
-            for x in range(max(0, self.humans[i].x - 1), min(game.consts.length, self.humans[i].x + game.consts.body_length + 1)):
-                for y in range(max(0, self.humans[i].y - 1), min(game.consts.width, self.humans[i].y + game.consts.body_length + 1)):
-                    if game.field[x][y] == 3:
-                        game.field[x][y] = 0
-        for i in range(self.consts.players):
-            for x in range(self.humans[i].x, self.humans[i].x + game.consts.body_length):
-                for y in range(self.humans[i].y, self.humans[i].y + game.consts.body_length):
-                    game.field[x][y] = 3
+            
         cur_bullets = list(self.bullets.keys())
         for bullet in cur_bullets:
             bullet = self.bullets[bullet]
@@ -247,8 +243,9 @@ class Game:
                     x = is_destroyed[1]
                     y = is_destroyed[2]
                     for human in self.humans:
-                        if (x - human.x <= 2) and (y - human.y <= 2):
+                        if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length):
                             human.die()
+                            answer['humans'][human.id]['die'] = True
                 if (is_destroyed[0] == 2):
                     x = is_destroyed[1]
                     y = is_destroyed[2]
