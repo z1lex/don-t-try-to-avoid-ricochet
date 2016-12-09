@@ -221,7 +221,7 @@ class Game:
         #commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
         answer = ans_init() 
         for i in range(self.consts.players):
-            ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour)
+            ans_move, new_bullets = self.humans[i].do_move(commands[i], is_fire[i], cursour[i])
             if ans_move == None and new_bullets == None: #died
                 answer['humans'][i]['move'] = []
             elif ans_move == None and new_bullets == 'resp': #already resp
