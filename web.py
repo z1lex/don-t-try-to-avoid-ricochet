@@ -4,7 +4,7 @@ import other
 import json
 players = 2
 default_data = [[], False, [None, None]]
-timeout = 5
+timeout = 20
 sock = socket.socket()
 port = 3228
 sock.bind(("127.0.0.1", port)) 
@@ -40,16 +40,16 @@ while True:
         #    print("chto-to-poshlo-ne-tak")
             
         curdata.append(data)
-    #all_commands = []
-    #all_is_fires = []
-    #all_curs = []
+    all_commands = []
+    all_is_fires = []
+    all_curs = []
 
-    all_commands, all_is_fires, all_curs = zip(*curdata)
+    #all_commands, all_is_fires, all_curs = zip(*curdata)
 
-    '''for data in curdata:
+    for data in curdata:
         all_commands.append(data[0])
         all_is_fires.append(data[1])
-        all_is_fires.append(data[2])'''
+        all_curs.append(data[2])
 
     tmp = server.game.do_tick(all_commands, all_is_fires, all_curs)
     print(tmp)

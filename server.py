@@ -217,7 +217,10 @@ class Game:
 
 
     def do_tick(self, commands, is_fire, cursour):
-        cursour = Vector(cursour[0], cursour[1])
+        for i in range(game.consts.maxplayers):
+            cursour[i] = Vector(cursour[i][0], cursour[i][1])
+            
+        #cursour = Vector(cursour[0], cursour[1])
         #commands, is_fire, cursour = convert_input(commands, is_fire, cursour)
         answer = ans_init() 
         for i in range(self.consts.players):
@@ -266,7 +269,7 @@ class Game:
                 answer['bullets'][bullet.id]['pts'] = pts[::-1]
                 if not ('is_resp' in answer['bullets'][bullet.id]):
                     answer['bullets'][bullet.id]['is_resp'] = False
-        answer['consts'] = 'suka_blyat'
+        answer['consts'] = ''
         return answer
         #return transform_ans(answer)
     
