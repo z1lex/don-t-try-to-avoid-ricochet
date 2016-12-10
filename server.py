@@ -266,7 +266,12 @@ class Game:
                     answer['bullets'][bullet.id] = dict()
                 answer['bullets'][bullet.id]['pos'] = [bullet.x, bullet.y]
                 answer['bullets'][bullet.id]['direction'] = [bullet.vector.x, bullet.vector.y]
-                answer['bullets'][bullet.id]['pts'] = pts[::-1]
+
+                converted_points = pts[::-1]
+                for i, point in enumerate(converted_points):
+                    converted_points[i] = [point.x, point.y]
+                    
+                answer['bullets'][bullet.id]['pts'] = converted_points
                 if not ('is_resp' in answer['bullets'][bullet.id]):
                     answer['bullets'][bullet.id]['is_resp'] = False
         answer['consts'] = ''
