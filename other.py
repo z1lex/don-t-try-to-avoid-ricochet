@@ -2,25 +2,35 @@ import math
 import sys
 class Consts:
     def __init__(self, players = 2):
-        self.maxplayers = 2
+        self.maxplayers = 1
         self.eps = 1e-5
         self.resp = [0 for i in range(self.maxplayers)]
         self.resp[0] = [5, 5] #in decart
         self.resp[1] = [14, 14] #in decart
         self.players = players
         self.body_length = 3 #hitbox is square
-        self.tick_rate = 100
-        self.human_speed = 0.2 #dist per tick
-        self.bullet_speed = 0.5 #dist per tick
+        self.tick_rate = 50
+        self.human_speed = 0.5 #dist per tick
+        self.bullet_speed = 1.0 #dist per tick
         self.respawn_time = 200 #ticks
         self.shoot_cooldown = 1 * self.tick_rate #in ticks
         self.move_cooldown = int(1 / self.human_speed + self.eps)
         self.width = 20 #parallel OY
         self.length = 20 #parallel OX
-        self.pixels_on_one_square = 8
+        self.pixels_on_one_square = 20 #it is pixels in line of squere
         self.bullet_maxenergy = 504
         self.bullet_flycost = 14 #lost per tick 
         self.bullet_ricochet_cost = 88 #lost per ricochet
+        self.start_field =                      [[2 * ((j <= 1) or
+                                                   (i <= 1) or
+                                                   (i >= self.length - 2) or
+                                                   (j >= self.width - 2))
+                                                for j in range(self.width)] for i in range(self.length)]
+        self.index_of_key_w = 0x57
+        self.index_of_key_s = 0x53
+        self.index_of_key_a = 0x41
+        self.index_of_key_d = 0x44 #this is client consts for some optimisation
+        self.color = ['green', 'red', 'pink']
 consts = Consts()
 def ans_init():
     answer = dict()
@@ -59,14 +69,14 @@ def transform_ans(answer):
 '''
 example of answer
 answer = {
-    humans = [
+    humans = {
         0:
             move = ['w', 'a'] #commands that executed
             is_resp = True
         1:
             move = []
             die = True
-    ]
+    }
     bullets = { #key is id
        12: pos = vector(12, 34)
            direction = vector(2.2, -1.5) #length is distanse per 1 tick
@@ -84,7 +94,11 @@ answer = {
         [1, 2, 3], # point (1, 2) converted in 3
         [x, y, d]
     ]
-    consts = Consts #object of class Consts (mb changed)
+    field = [[0, 0, 0, 1, 0],
+             [0, 1, 2, 0, 1],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 1, 0, 0]]
 }
 '''
 #def get_commands
