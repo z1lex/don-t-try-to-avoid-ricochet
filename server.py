@@ -202,11 +202,7 @@ class Bullet:
         return is_destroyed, pts
             
 class Game:
-    def __init__(self, players = 2, field = [[2 * ((j <= 1) or
-                                                   (i <= 1) or
-                                                   (i >= Consts().length - 2) or
-                                                   (j >= Consts().width - 2))
-                                                for j in range((Consts().width))] for i in range(Consts().length)]):
+    def __init__(self, players = Consts().players, field = Consts().start_field):
         self.consts = Consts(players)
         self.field = field #0 is free, 1 is breakable, 2 is unbreakable(ricochet wall)
         self.humans = []
@@ -217,7 +213,7 @@ class Game:
 
 
     def do_tick(self, commands, is_fire, cursour):
-        for i in range(game.consts.maxplayers):
+        for i in range(game.consts.players):
             cursour[i] = Vector(cursour[i][0], cursour[i][1])
             
         #cursour = Vector(cursour[0], cursour[1])
