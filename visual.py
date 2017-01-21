@@ -64,11 +64,26 @@ class Square:
                                        (x + 1) * consts.pixels_on_one_square,
                                        (y + 1) * consts.pixels_on_one_square,
                                        fill = consts.color[new_value], outline = consts.color[new_value])
+
+class Bullet:
+    def __init__(self, index, x, y):
+        self.x = x
+        self.y = y
+        self.index = index
+        self.object = canvas.create_rectangle(x * consts.pixels_on_one_square,
+                                       y * consts.pixels_on_one_square,
+                                       (x + 1) * consts.pixels_on_one_square,
+                                       (y + 1) * consts.pixels_on_one_square, fill = consts.bullet_color, outline = consts.bullet_color)
+    def do_move(self, new_x, new_y):
+        change_x = new_x - self.x
+        change_y = new_y - self.y
+        canvas.move(self.object, change_x, change_y)
+    def delete(self):
+        canvas.delete(self.object)
 def is_enable(key_index):
     return (win32api.GetKeyState(key_index) < 0)
 
 def get_buttons():
-    is_fire = False
     answer = []
     forward_flag = False
     strafe_flag = False
@@ -91,14 +106,13 @@ def get_buttons():
             answer.pop() #if d and a has preesed, we don't need to consider it
         else:
             answer.append('d')
-    if is_enable(consts.index_of_fire):
-        is_fire = True
-    return answer, is_fire
+    return answer
 
 
 
 players = [] # elem is [a, x, y], a - his canvas object; x,y - his coords
 field = copy.deepcopy(consts.start_field)
+bullets = dict()
 for x in range(len(field)):
     for y in range(len(field[x])):
         field[x][y] = Square(x, y, field[x][y])
@@ -124,18 +138,43 @@ sock = socket.socket()
 sock.connect(("127.0.0.1", port))
 while True:
     time_of_begin_of_tick = time.time()
-    current_buttons, is_fire = get_buttons()
-    client_answer = [current_buttons, is_fire, [0, 0]]
+    current_buttons = get_buttons()
+    client_answer = [current_buttons, False, [0, 0]]
     sock.send(json.dumps(client_answer).encode())
     try:
         server_answer = json.loads(str(sock.recv(1024), encoding = 'ascii'))
         for player in range(consts.players):
             players[player].do_move(server_answer['humans'][str(player)]['move'])
-        canvas.update()
+        del_bullets = []
+        new_bullets = [] # elem is [id, x, y]
+        for key in server_answer['bullets'].keys():
+            action_flag = False
+            if ('is_resp' in server_answer['bullets'][key]) and (server_answer['bullets'][key]['is_resp']):
+                new_bullets.append([key, server_answer['bullets'][key]['pos'][0], server_answer['bullets'][key]['pos'][1]])
+                action_flag = True
+            if ('die' in server_answer['bullets'][key]) and (server_answer['bullets'][key]['die'] == True):
+                del_bullets.append(key)
+                action_flag = True
+            if (not action_flag):
+                x = server_answer['bullets'][key]['pos'][0]
+                y = server_answer['bullets'][key]['pos'][1]
+                bullets[key].do_move(x, y)
+        for bullet in new_bullets:
+            index = bullet[0]
+            x = bullet[1]
+            y = bullet[2]
+            bullets[index] = Bullet(index, x, y)
+        for index in del_bullets:
+            bullets.pop(index)
+            
+            
+            
+        
     except:
         pass
     time_of_end_of_tick = time.time()
     remaning_time = 1/consts.tick_rate - (time_of_end_of_tick - time_of_begin_of_tick)
+    canvas.update()
     if (remaning_time < 0):
         print("some wrong")
     else:
