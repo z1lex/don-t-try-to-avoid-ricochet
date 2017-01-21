@@ -85,6 +85,7 @@ def is_enable(key_index):
 
 def get_buttons():
     answer = []
+    is_fire = False
     forward_flag = False
     strafe_flag = False
     if is_enable(consts.index_of_key_w):
@@ -106,7 +107,9 @@ def get_buttons():
             answer.pop() #if d and a has preesed, we don't need to consider it
         else:
             answer.append('d')
-    return answer
+    if is_enable(consts.index_of_fire):
+        is_fire = True
+    return answer, is_fire
 
 
 
@@ -138,8 +141,8 @@ sock = socket.socket()
 sock.connect(("127.0.0.1", port))
 while True:
     time_of_begin_of_tick = time.time()
-    current_buttons = get_buttons()
-    client_answer = [current_buttons, False, [0, 0]]
+    current_buttons, is_fire = get_buttons()
+    client_answer = [current_buttons, is_fire, [0, 0]]
     sock.send(json.dumps(client_answer).encode())
     try:
         server_answer = json.loads(str(sock.recv(1024), encoding = 'ascii'))
