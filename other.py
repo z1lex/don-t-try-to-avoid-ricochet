@@ -1,8 +1,8 @@
 import math
 import sys
 class Consts:
-    def __init__(self, players = 2):
-        self.maxplayers = 1
+    def __init__(self, players = 1):
+        self.maxplayers = 2
         self.eps = 1e-5
         self.resp = [0 for i in range(self.maxplayers)]
         self.resp[0] = [5, 5] #in decart
@@ -26,11 +26,13 @@ class Consts:
                                                    (i >= self.length - 2) or
                                                    (j >= self.width - 2))
                                                 for j in range(self.width)] for i in range(self.length)]
+        self.index_of_fire = 0x08 #space
         self.index_of_key_w = 0x57
         self.index_of_key_s = 0x53
         self.index_of_key_a = 0x41
         self.index_of_key_d = 0x44 #this is client consts for some optimisation
         self.color = ['green', 'red', 'pink']
+        self.bullet_color = 'red'
 consts = Consts()
 def ans_init():
     answer = dict()
@@ -86,6 +88,7 @@ answer = {
            is_resp = False
            direction = vector(2, -1)
            pts = [vector(7.6, 8.3)]
+           die = True
        0:  pos = vector(1, 1)
            direction = (-1.1, -2.2)
            is_resp = True
