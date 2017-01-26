@@ -30,7 +30,7 @@ while True:
     for i, conn in enumerate(conns):
         try:
             data = conn.recv(1024)
-            #print(data)
+            print(data)
             data = str(data, encoding = 'ascii')
             #print(data, repr(data))
             data = json.loads(data)
@@ -59,7 +59,7 @@ while True:
         all_curs.append(data[2])
 
     tmp = server.game.do_tick(all_commands, all_is_fires, all_curs)
-    #print(tmp)
+    print(tmp)
     output = json.dumps(tmp).encode()
         
     for i, conn in enumerate(conns):

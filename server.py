@@ -184,7 +184,7 @@ class Bullet:
         if game.field[x][y] == 0:
             #bullet has destroyed human maybe
             for human in game.humans:
-                if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length):
+                if (human.x <= self.x < human.x + game.consts.body_length) and (human.y <= self.y < human.y + game.consts.body_length):
                     if (human.id != self.creator_id):
                         return [3, x, y], [Vector(self.x, self.y)]
                     else:

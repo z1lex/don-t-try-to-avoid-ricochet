@@ -77,7 +77,9 @@ class Bullet:
     def do_move(self, new_x, new_y):
         change_x = new_x - self.x
         change_y = new_y - self.y
-        canvas.move(self.object, change_x, change_y)
+        canvas.move(self.object,
+                    change_x * consts.pixels_on_one_square,
+                    change_y * consts.pixels_on_one_square)
     def delete(self):
         canvas.delete(self.object)
 def is_enable(key_index):
@@ -142,9 +144,11 @@ sock.connect(("127.0.0.1", port))
 while True:
     time_of_begin_of_tick = time.time()
     current_buttons, is_fire = get_buttons()
-    client_answer = [current_buttons, is_fire, [0, 0]]
+    print(is_fire)
+    client_answer = [current_buttons, is_fire, [1, 1]]
     sock.send(json.dumps(client_answer).encode())
     try:
+    #if 1:
         server_answer = json.loads(str(sock.recv(1024), encoding = 'ascii'))
         for player in range(consts.players):
             players[player].do_move(server_answer['humans'][str(player)]['move'])
@@ -168,6 +172,7 @@ while True:
             y = bullet[2]
             bullets[index] = Bullet(index, x, y)
         for index in del_bullets:
+            bullets[index].delete()
             bullets.pop(index)
             
             

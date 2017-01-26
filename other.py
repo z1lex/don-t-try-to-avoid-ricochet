@@ -9,7 +9,7 @@ class Consts:
         self.resp[1] = [14, 14] #in decart
         self.players = players
         self.body_length = 3 #hitbox is square
-        self.tick_rate = 50
+        self.tick_rate = 15
         self.human_speed = 0.5 #dist per tick
         self.bullet_speed = 1.0 #dist per tick
         self.respawn_time = 200 #ticks
@@ -18,7 +18,7 @@ class Consts:
         self.width = 20 #parallel OY
         self.length = 20 #parallel OX
         self.pixels_on_one_square = 20 #it is pixels in line of squere
-        self.bullet_maxenergy = 504
+        self.bullet_maxenergy = 500
         self.bullet_flycost = 14 #lost per tick 
         self.bullet_ricochet_cost = 88 #lost per ricochet
         self.start_field =                      [[2 * ((j <= 1) or
@@ -26,7 +26,7 @@ class Consts:
                                                    (i >= self.length - 2) or
                                                    (j >= self.width - 2))
                                                 for j in range(self.width)] for i in range(self.length)]
-        self.index_of_fire = 0x08 #space
+        self.index_of_fire = 0x20 #space
         self.index_of_key_w = 0x57
         self.index_of_key_s = 0x53
         self.index_of_key_a = 0x41
