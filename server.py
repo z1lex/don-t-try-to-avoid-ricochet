@@ -115,6 +115,7 @@ class Bullet:
                 continue
             if (square.x >= self.x) and self.vector.x <= 0:
                 continue
+            #need to check squares around self
             if game.field[square.x][square.y] != 0:
                 if self.x < square.x or self.x > square.x + 1 or self.y < square.y or self.y > square.y + 1:
                     return square

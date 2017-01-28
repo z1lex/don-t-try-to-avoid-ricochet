@@ -19,7 +19,7 @@ class Consts:
         self.length = 20 #parallel OX
         self.pixels_on_one_square = 20 #it is pixels in line of squere
         self.bullet_maxenergy = 500
-        self.bullet_flycost = 5 #lost per tick 
+        self.bullet_flycost = 7 #lost per tick 
         self.bullet_ricochet_cost = 88 #lost per ricochet
         self.start_field =                      [[2 * ((j <= 1) or
                                                    (i <= 1) or
@@ -180,6 +180,11 @@ class Line:
                 ymax = min(Consts().width, math.floor(max(y1, y2) + Consts().eps))
                 for y in range(max(ymin, 0), min(ymax + 1, Consts().width)):
                     self.crossing_squares.append(Vector(x, y))
+        fixed_crossing_squares = []
+        for elem in self.crossing_squares:
+            if self.cross_square(Vector(elem.x, elem.y), Vector(elem.x + 1, elem.y + 1)):
+                fixed_crossing_squares.append(elem)
+        self.crossing_squares = fixed_crossing_squares
 
 
     def cross_square(self, p1, p2):
