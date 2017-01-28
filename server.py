@@ -1,5 +1,7 @@
 from other import *
+import sys
 import socket
+sys.setrecursionlimit(100)
 
 class Human:
     def __init__(self, x, y, id):
@@ -105,7 +107,10 @@ class Bullet:
             indexacya = -1
         else:
             indexacya = 1
-        for square in self.line.crossing_squares[::indexacya]:
+        squares = self.line.crossing_squares[::indexacya]
+        squares.sort(key = lambda square: square.dist(Vector(self.x, self.y)))
+        
+        for square in squares:
             if (square.x + 1 <= self.x) and self.vector.x >= 0:
                 continue
             if (square.x >= self.x) and self.vector.x <= 0:
@@ -116,13 +121,13 @@ class Bullet:
                 else:
                     continue
             for human in game.humans:
-                if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length) and (self.creator_id != self.id):
+                if (human.x <= square.x < human.x + game.consts.body_length) and (human.y <= square.y < human.y + game.consts.body_length) and (self.creator_id != human.id):
                     return square
         return None
 
 
     def first_crossed_point(self):
-        pts = self.line.cross_square(self.first_crossed(), self.first_crossed() + Vector(1, 1))
+        pts = self.line.cross_square(self.first_crossed() - Vector(0.5, 0.5), self.first_crossed() + Vector(0.5, 0.5))
         if len(pts) == 0:
             return None
         ans = pts[0]
@@ -137,7 +142,9 @@ class Bullet:
 
     def vector_change_on_move(self):
         pt = self.first_crossed_point()
-        if self.is_int(pt.x):
+        if self.is_int(pt.x + 0.5) and self.is_int(pt.y + 0.5):
+            return Vector(-self.vector.x, -self.vector.y)
+        elif self.is_int(pt.x + 0.5):
             return Vector(-self.vector.x, self.vector.y)
         else:
             return Vector(self.vector.x, -self.vector.y)
@@ -192,7 +199,8 @@ class Bullet:
         if self.kinetic < game.consts.bullet_ricochet_cost:
             #bullet is destroyed
             return [0], [Vector(self.x, self.y)]
-        self.vector = bullet_change_move
+        if (not is_self_tank):
+            self.vector = bullet_change_move
         self.line = Line(self.x, self.y, self.x + self.vector.x, self.y + self.vector.y)
         curx = self.x
         cury = self.y

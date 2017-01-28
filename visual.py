@@ -75,11 +75,15 @@ class Bullet:
                                        (x + 1) * consts.pixels_on_one_square,
                                        (y + 1) * consts.pixels_on_one_square, fill = consts.bullet_color, outline = consts.bullet_color)
     def do_move(self, new_x, new_y):
-        change_x = new_x - self.x
-        change_y = new_y - self.y
-        canvas.move(self.object,
-                    change_x * consts.pixels_on_one_square,
-                    change_y * consts.pixels_on_one_square)
+        self.x = new_x
+        self.y = new_y
+        x = self.x
+        y = self.y
+        canvas.delete(self.object)
+        self.object = canvas.create_rectangle(x * consts.pixels_on_one_square,
+                                       y * consts.pixels_on_one_square,
+                                       (x + 1) * consts.pixels_on_one_square,
+                                       (y + 1) * consts.pixels_on_one_square, fill = consts.bullet_color, outline = consts.bullet_color)
     def delete(self):
         canvas.delete(self.object)
 def is_enable(key_index):
@@ -145,7 +149,7 @@ while True:
     time_of_begin_of_tick = time.time()
     current_buttons, is_fire = get_buttons()
     print(is_fire)
-    client_answer = [current_buttons, is_fire, [1, 1]]
+    client_answer = [current_buttons, is_fire, [0.72141, 0.51252]]
     sock.send(json.dumps(client_answer).encode())
     try:
     #if 1:

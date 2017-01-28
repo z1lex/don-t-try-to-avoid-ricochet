@@ -19,7 +19,7 @@ class Consts:
         self.length = 20 #parallel OX
         self.pixels_on_one_square = 20 #it is pixels in line of squere
         self.bullet_maxenergy = 500
-        self.bullet_flycost = 14 #lost per tick 
+        self.bullet_flycost = 5 #lost per tick 
         self.bullet_ricochet_cost = 88 #lost per ricochet
         self.start_field =                      [[2 * ((j <= 1) or
                                                    (i <= 1) or

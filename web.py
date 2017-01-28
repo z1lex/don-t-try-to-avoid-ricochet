@@ -30,7 +30,7 @@ while True:
     for i, conn in enumerate(conns):
         try:
             data = conn.recv(1024)
-            print(data)
+            #print(data)
             data = str(data, encoding = 'ascii')
             #print(data, repr(data))
             data = json.loads(data)
