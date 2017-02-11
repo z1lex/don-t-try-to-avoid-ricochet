@@ -108,12 +108,16 @@ class Bullet:
         else:
             indexacya = 1
         squares = self.line.crossing_squares[::indexacya]
-        squares.sort(key = lambda square: square.dist(Vector(self.x, self.y)))
-        
+        squares.sort(key = lambda square: min([p.dist(Vector(self.x, self.y)) for p in 
+                     self.line.cross_square(square - Vector(0.5, 0.5), square + Vector(0.5, 0.5))]))
+        square = squares[0]
+        if min([p.dist(Vector(self.x, self.y)) for p in 
+                     self.line.cross_square(square - Vector(0.5, 0.5), square + Vector(0.5, 0.5))]) < game.consts.eps:
+            squares.pop(0)
         for square in squares:
-            if (square.x + 1 <= self.x) and self.vector.x >= 0:
+            if (square.x + 0.5 <= self.x) and self.vector.x >= 0:
                 continue
-            if (square.x >= self.x) and self.vector.x <= 0:
+            if (square.x - 0.5 >= self.x) and self.vector.x <= 0:
                 continue
             #need to check squares around self
             if game.field[square.x][square.y] != 0:
@@ -190,6 +194,7 @@ class Bullet:
             return [2, x, y], [Vector(self.x, self.y)]
         is_self_tank = False
         if game.field[x][y] == 0:
+            print('suka blyat')
             #bullet has destroyed human maybe
             for human in game.humans:
                 if (human.x <= self.x < human.x + game.consts.body_length) and (human.y <= self.y < human.y + game.consts.body_length):

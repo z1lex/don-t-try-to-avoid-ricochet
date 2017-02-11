@@ -148,7 +148,7 @@ sock.connect(("127.0.0.1", port))
 while True:
     time_of_begin_of_tick = time.time()
     current_buttons, is_fire = get_buttons()
-    print(is_fire)
+    #print(is_fire)
     client_answer = [current_buttons, is_fire, [0.72141, 0.51252]]
     sock.send(json.dumps(client_answer).encode())
     try:

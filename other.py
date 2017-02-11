@@ -157,6 +157,7 @@ class Vector:
 
 class Line:
     def __init__(self, x1, y1, x2, y2):
+        self.consts = Consts()
         self.flag = False
         if (x1 == x2):
             #self.flag = True #line don't cross OY
@@ -166,25 +167,35 @@ class Line:
         else:
             self.k = (y2 - y1) / (x2 - x1)
             self.b = y1 - self.k * x1
+        
         self.crossing_squares = [] #squares on a Cartesian system.
-        if (x1 == x2):
+        '''
+        for x in range(Consts().length):
             for y in range(Consts().width):
+                cur = Vector(x, y)
+                delta = Vector(0.5, 0.5)
+                if self.cross_square(cur - delta, cur + delta) != []:
+                    self.crossing_squares.append(cur)
+        '''
+        if (x1 == x2):
+            for y in range(self.consts.width):
                 self.crossing_squares.append(Vector(x1, y))
         else:
-            for x in range(Consts().length):
+            for x in range(self.consts.length):
                 y1 = self.k * x + self.b
                 #max(0, math.floor(self.k * x + self.b))
                 y2 = self.k * x + self.b + self.k
                 #min(Consts().width, math.floor(self.k * x + self.b + self.k))
                 ymin = max(0, math.floor(min(y1, y2)))
-                ymax = min(Consts().width, math.floor(max(y1, y2) + Consts().eps))
-                for y in range(max(ymin, 0), min(ymax + 1, Consts().width)):
+                ymax = min(self.consts.width, math.floor(max(y1, y2) + self.consts.eps))
+                for y in range(max(ymin - 2, 0), min(ymax + 2, self.consts.width)):
                     self.crossing_squares.append(Vector(x, y))
         fixed_crossing_squares = []
         for elem in self.crossing_squares:
-            if self.cross_square(Vector(elem.x, elem.y), Vector(elem.x + 1, elem.y + 1)):
+            if self.cross_square(Vector(elem.x - 0.5, elem.y - 0.5), Vector(elem.x + 0.5, elem.y + 0.5)):
                 fixed_crossing_squares.append(elem)
         self.crossing_squares = fixed_crossing_squares
+        
 
 
     def cross_square(self, p1, p2):
@@ -194,13 +205,13 @@ class Line:
             return []
         else:
             ans = []
-            if (p1.x - Consts().eps <= (p1.y - self.b) / self.k <= p1.x + 1 + Consts().eps):
+            if (p1.x - self.consts.eps <= (p1.y - self.b) / self.k <= p1.x + 1 + self.consts.eps):
                 ans.append(Vector((p1.y - self.b) / self.k, p1.y))
-            if (p1.x - Consts().eps <= (p1.y + 1 - self.b) / self.k <= p1.x + 1 + Consts().eps):
+            if (p1.x - self.consts.eps <= (p1.y + 1 - self.b) / self.k <= p1.x + 1 + self.consts.eps):
                 ans.append(Vector((p1.y + 1 - self.b) / self.k, p1.y + 1))
-            if (p1.y - Consts().eps <= (p1.x * self.k + self.b) <= p1.y + 1 + Consts().eps):
+            if (p1.y - self.consts.eps <= (p1.x * self.k + self.b) <= p1.y + 1 + self.consts.eps):
                 ans.append(Vector(p1.x, p1.x * self.k + self.b))
-            if (p1.y - Consts().eps <= ((p1.x + 1) * self.k + self.b) <= p1.y + 1 + Consts().eps):
+            if (p1.y - self.consts.eps <= ((p1.x + 1) * self.k + self.b) <= p1.y + 1 + self.consts.eps):
                 ans.append(Vector(p1.x + 1, (p1.x + 1) * self.k + self.b))
             return ans
             
